@@ -1,0 +1,7 @@
+.flex{
+    display: inline-flex;
+
+}
+.bg-gray-600{
+    background-color: grey;
+}

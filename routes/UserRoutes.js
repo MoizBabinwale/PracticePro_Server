@@ -1,0 +1,11 @@
+const express = require("express");
+const router = express.Router();
+const { Signup, Login } = require("../Controllers/userController");
+const { createOreder, getToken, checkePaymentStatus, resetUserData } = require("../Instamojo/instamojo");
+router.post("/signup", Signup);
+router.post("/login", Login);
+router.post("/get-token", getToken);
+router.post("/create-order", createOreder);
+router.get("/check-payment-status", checkePaymentStatus);
+router.get("/resetUserData", resetUserData);
+module.exports = router;

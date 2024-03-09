@@ -33,6 +33,7 @@ const createQuestion = async (req, res) => {
       subjectId,
       testId,
       difficultyLevel,
+      optionType: "text",
     });
 
     // Save the question to the database
@@ -217,8 +218,25 @@ const getDifficulty = async (req, res) => {
 
 const getAllTest = async (req, res) => {
   try {
-    const allTests = await Test.find();
-    res.status(201).json({ message: "Test Name Fetched Successfully", allTests });
+    console.log("hitetdd");
+    const allTests = await Test.find()
+      .populate({
+        path: "subjectIds",
+        model: "Subject",
+      })
+      .exec();
+
+    // Now, you have populated subjectIds. You can further populate the Subject field within each subject document.
+    allTests.forEach((test) => {
+      test.subjectIds.forEach((subject) => {
+        subject.populate("Subject");
+      });
+    });
+
+    // Now, allTests will contain subjects populated within subjectIds array.
+
+    console.log("res", allTests);
+    res.status(201).json({ message: "Test Name Fetched Successfully", Tests: allTests });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -281,6 +299,61 @@ const getAllResult = async (req, res) => {
   }
 };
 
+const createQuestionwithImage = async (req, res) => {
+  // Example:
+  try {
+    const { text, options, subjectId, testId, difficultyLevel } = req.body;
+
+    const jsonOption = JSON.parse(options);
+    for (let fileIndex = 0; fileIndex < req.files.length; fileIndex++) {
+      const path = req.files[fileIndex].path;
+      // Update the text property of the corresponding option
+      jsonOption[fileIndex].text = path;
+      // console.log("  options[fileIndex]", options[fileIndex]);
+    }
+
+    const question = new Question({
+      text: JSON.parse(text),
+      options: jsonOption,
+      subjectId: JSON.parse(subjectId),
+      testId: JSON.parse(testId),
+      difficultyLevel: JSON.parse(difficultyLevel),
+      optionType: "image",
+    });
+
+    const savedQuestion = question.save();
+    res.status(201).json(savedQuestion);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const deleteQeustions = async (req, res) => {
+  const { _id } = req.body; // Assuming _id is sent in the request body
+
+  try {
+    // Check if _id is provided
+    if (!_id) {
+      return res.status(400).json({ error: "Please provide _id" });
+    }
+
+    // Find the question by _id and delete it
+    const deletedQuestion = await Question.findByIdAndDelete(_id);
+
+    if (!deletedQuestion) {
+      return res.status(404).json({ error: "Question not found" });
+    }
+
+    // If the question is deleted successfully, send a success response
+    return res.status(200).json({ message: "Question deleted successfully" });
+  } catch (error) {
+    // If an error occurs, send an error response
+    console.error("Error deleting question:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   getAllSubjects,
   createSubject,
@@ -298,4 +371,6 @@ module.exports = {
   getquestionswithLimit,
   checkAnswer,
   getAllResult,
+  createQuestionwithImage,
+  deleteQeustions,
 };

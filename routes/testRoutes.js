@@ -16,11 +16,16 @@ const {
   getQuestionsBySubjectAndTestId,
   getAllTest,
   getAllResult,
+  createQuestionwithImage,
+  deleteQeustions,
 } = require("../Controllers/testController");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
+const upload = require("../middleware/upload");
+
 router.post("/createSubject", auth, createSubject);
 router.post("/createQuestion", auth, createQuestion);
+router.post("/createQuestionWithImage", upload.array("avatar[]"), createQuestionwithImage);
 router.post("/createTest", auth, createTest);
 router.post("/appendToTest", auth, appendToTest);
 router.post("/getQuestion", auth, getQuestionsBySubjectAndTestId);
@@ -28,6 +33,7 @@ router.post("/updateQuestion", auth, updateQuestions);
 router.post("/getquestionswithLimit", auth, getquestionswithLimit);
 router.post("/checkAnswer", auth, checkAnswer);
 router.get("/getAllResult", auth, getAllResult);
+router.post("/deleteQeustions", auth, deleteQeustions);
 
 router.get("/getAllSubjects", auth, getAllSubjects);
 router.get("/getSubjects/:testId", auth, getSubjectsForTest);

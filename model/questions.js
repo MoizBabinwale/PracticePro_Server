@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Options = require("./options");
 
 const questionSchema = new mongoose.Schema({
   text: {
@@ -14,10 +15,14 @@ const questionSchema = new mongoose.Schema({
       isCorrect: {
         type: Boolean,
         required: true,
-        default: false,
       },
     },
   ],
+  optionType: {
+    type: String,
+    required: true,
+    default: "text",
+  },
   subjectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Subject",

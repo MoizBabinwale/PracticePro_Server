@@ -8,6 +8,7 @@ const appRoute = require("./routes/UserRoutes.js");
 app.use(cors());
 const testRoute = require("./routes/testRoutes.js");
 app.use(express.json({ limit: "30mb", extended: true }));
+app.use("/uploads", express.static("uploads"));
 // app.use(express.static("uploads"));
 //Routes
 app.use("/api", appRoute);

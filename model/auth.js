@@ -15,4 +15,14 @@ const UserSchema = mongoose.Schema({
   },
 });
 
+// Define a pre-save hook to update isSubscribed based on planExpiryDate
+UserSchema.pre("save", function (next) {
+  const currentDate = new Date();
+  if (this.subscription.planExpiryDate && this.subscription.planExpiryDate < currentDate) {
+    // If plan expiry date has passed, set isSubscribed to false
+    this.subscription.isSubscribed = false;
+  }
+  next();
+});
+
 module.exports = mongoose.model("User", UserSchema);

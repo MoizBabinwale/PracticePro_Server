@@ -219,23 +219,9 @@ const getDifficulty = async (req, res) => {
 const getAllTest = async (req, res) => {
   try {
     console.log("hitetdd");
-    const allTests = await Test.find()
-      .populate({
-        path: "subjectIds",
-        model: "Subject",
-      })
-      .exec();
-
-    // Now, you have populated subjectIds. You can further populate the Subject field within each subject document.
-    allTests.forEach((test) => {
-      test.subjectIds.forEach((subject) => {
-        subject.populate("Subject");
-      });
-    });
-
+    const allTests = await Test.find().populate("subjectIds").exec();
     // Now, allTests will contain subjects populated within subjectIds array.
 
-    console.log("res", allTests);
     res.status(201).json({ message: "Test Name Fetched Successfully", Tests: allTests });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -7,12 +7,6 @@ const subjectSchema = new mongoose.Schema({
     unique: true,
   },
   description: String,
-  topics: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Topic",
-    },
-  ],
 });
 
 module.exports = mongoose.model("Subject", subjectSchema);

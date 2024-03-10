@@ -54,8 +54,8 @@ const createOreder = async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `http://localhost:3000/success?&status=Success&userData=${encodeURIComponent(JSON.stringify(updatedUserData))}`,
-      cancel_url: `http://localhost:3000/cancel?status=Fail&suerData=${encodeURIComponent(JSON.stringify(updatedUserData))}`,
+      success_url: `https://practice-pro-client.vercel.app/success?&status=Success&userData=${encodeURIComponent(JSON.stringify(updatedUserData))}`,
+      cancel_url: `https://practice-pro-client.vercel.app/cancel?status=Fail&suerData=${encodeURIComponent(JSON.stringify(updatedUserData))}`,
     });
 
     console.log("session", session);

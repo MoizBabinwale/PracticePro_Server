@@ -297,7 +297,7 @@ const checkAnswer = async (req, res) => {
 const getAllResult = async (req, res) => {
   try {
     const userId = req.userId;
-    const results = await Result.find({ userId: userId });
+    const results = await Result.find({ userId: userId }).sort({ date: -1 });
     res.status(200).json({ message: "Result Fetched", results });
   } catch (error) {
     console.error("Error:", error);

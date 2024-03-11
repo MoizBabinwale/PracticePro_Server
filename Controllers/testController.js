@@ -4,6 +4,8 @@ const Test = require("../model/tests");
 const TimeLimit = require("../model/timeLimit");
 const DifficultyLevel = require("../model/difficultyLevel");
 const Result = require("../model/result");
+const { ObjectId } = require("mongoose");
+const mongoose = require("mongoose");
 
 // Controller functions for subjects
 const createSubject = async (req, res) => {
@@ -22,7 +24,8 @@ const createQuestion = async (req, res) => {
     const { text, options, subjectId, testId, difficultyLevel } = req.body;
 
     // Handle the case where _id is not present
-    const topicExists = await Subject.exists({ _id: subjectId });
+    const objectId = ObjectId(subjectId);
+    const topicExists = await Subject.exists({ _id: objectId });
 
     if (!topicExists) {
       throw new Error("Topic not found");
@@ -45,16 +48,34 @@ const createQuestion = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+const getDemoQuestion = async (req, res) => {
+  try {
+    // Query the database to find five demo questions
+    const demoQuestions = await Question.find().limit(5);
 
+    // Send the demo questions in the response
+    res.json({ demoQuestions });
+  } catch (error) {
+    console.error("Error fetching demo questions:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 const getquestionswithLimit = async (req, res) => {
   try {
     const { testId, topicId, difficultyId, questionLimit } = req.body;
-
-    let questions = await Question.find({
-      testId: testId,
-      subjectId: topicId,
-      difficultyLevel: difficultyId,
-    });
+    let questions;
+    if (difficultyId === "65e013c36b8fc10cabbcf493") {
+      questions = await Question.find({
+        testId: testId,
+        subjectId: topicId,
+      });
+    } else {
+      questions = await Question.find({
+        testId: testId,
+        subjectId: topicId,
+        difficultyLevel: difficultyId,
+      });
+    }
     questions = await shuffleArray(questions);
 
     // Limit the array to the specified questionLimit
@@ -84,7 +105,7 @@ const updateQuestions = async (req, res) => {
 
       if (_id) {
         const updatedQuestion = await Question.findByIdAndUpdate(
-          _id,
+          ObjectId(_id),
           {
             text,
             options,
@@ -218,7 +239,6 @@ const getDifficulty = async (req, res) => {
 
 const getAllTest = async (req, res) => {
   try {
-    console.log("hitetdd");
     const allTests = await Test.find().populate("subjectIds").exec();
     // Now, allTests will contain subjects populated within subjectIds array.
 
@@ -285,26 +305,53 @@ const getAllResult = async (req, res) => {
   }
 };
 
-const createQuestionwithImage = async (req, res) => {
+const createQuestionwithImageAswellOption = async (req, res) => {
   // Example:
   try {
     const { text, options, subjectId, testId, difficultyLevel } = req.body;
 
     const jsonOption = JSON.parse(options);
+    let QuestionImage;
     for (let fileIndex = 0; fileIndex < req.files.length; fileIndex++) {
       const path = req.files[fileIndex].path;
-      // Update the text property of the corresponding option
-      jsonOption[fileIndex].text = path;
-      // console.log("  options[fileIndex]", options[fileIndex]);
+      if (req.files[fileIndex].originalname.split(".")[0] === "questionImage") {
+        QuestionImage = path;
+      } else {
+        jsonOption[fileIndex - 1].text = path;
+      }
     }
 
     const question = new Question({
       text: JSON.parse(text),
       options: jsonOption,
+      questionImage: QuestionImage ? QuestionImage : null,
       subjectId: JSON.parse(subjectId),
       testId: JSON.parse(testId),
       difficultyLevel: JSON.parse(difficultyLevel),
       optionType: "image",
+    });
+
+    const savedQuestion = question.save();
+    res.status(201).json(savedQuestion);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const createQuestionImage = async (req, res) => {
+  // Example:
+  try {
+    const { options, subjectId, testId, difficultyLevel } = req.body;
+    const path = req.file.path;
+
+    const question = new Question({
+      text: path,
+      options: JSON.parse(options),
+      subjectId: subjectId,
+      testId: testId,
+      difficultyLevel: difficultyLevel,
+      optionType: "text",
     });
 
     const savedQuestion = question.save();
@@ -325,7 +372,7 @@ const deleteQeustions = async (req, res) => {
     }
 
     // Find the question by _id and delete it
-    const deletedQuestion = await Question.findByIdAndDelete(_id);
+    const deletedQuestion = await Question.findByIdAndDelete(ObjectId(_id));
 
     if (!deletedQuestion) {
       return res.status(404).json({ error: "Question not found" });
@@ -357,6 +404,8 @@ module.exports = {
   getquestionswithLimit,
   checkAnswer,
   getAllResult,
-  createQuestionwithImage,
+  createQuestionwithImageAswellOption,
   deleteQeustions,
+  createQuestionImage,
+  getDemoQuestion,
 };

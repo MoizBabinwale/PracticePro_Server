@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { Signup, Login } = require("../Controllers/userController");
+const { Signup, Login, verifyOtp } = require("../Controllers/userController");
 const { createOreder, getToken, checkePaymentStatus, resetUserData } = require("../Instamojo/instamojo");
 router.post("/signup", Signup);
+router.post("/verify-otp", verifyOtp);
 router.post("/login", Login);
 router.post("/get-token", getToken);
 router.post("/create-order", createOreder);

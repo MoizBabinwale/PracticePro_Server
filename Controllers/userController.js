@@ -17,57 +17,84 @@ const Signup = async (req, res) => {
     return res.status(404).json({ message: "User Alredy Exist" });
   }
   try {
-    // let config = {
-    //     service: 'gmail',
-    //     auth: {
-    //         user: EMAIL,
-    //         pass: PASSWORD
-    //     }
-
-    // }
-    // let transporter = nodemailer.createTransport(config)
-    // let mailGenerator = new Mailgen({
-    //     theme: 'default',
-    //     product: {
-    //         name: 'Mailgen',
-    //         link: 'https://mailgen.js/'
-    //     }
-    // })
-    // let response = {
-    //     body: {
-    //         name: 'Product Company',
-    //         intro: "Your Bill has arrived",
-    //         table: {
-    //             data: [
-    //                 {
-    //                     item: 'Nodemailer Stack Book',
-    //                     discription: "Nothing",
-    //                     Prize: '1000Rs'
-    //                 }
-    //             ]
-    //         },
-    //         outro: "Looking forward to do maore work with you."
-    //     }
-    // }
-    // let mail = mailGenerator.generate(response)
-    // let message = {
-    //     from: EMAIL,
-    //     to: userEmail, // set the recipient here
-    //     subject: 'Place Order',
-    //     html: mail
-    // }
-    // await transporter.sendMail(message)
+    const otp = await generateOTP();
+    let config = {
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
+    };
+    let transporter = nodemailer.createTransport(config);
+    let mailGenerator = new Mailgen({
+      theme: "default",
+      product: {
+        name: "Practice Pro - Registration ",
+        link: "https://practice-pro-client.vercel.app/",
+      },
+    });
+    let response = {
+      body: {
+        name: `Dear ${name ? name : "User"}`,
+        intro: `          
+          
+          Thank you for registering with Practice Pro. To complete your registration process, please use the following OTP (One-Time Password):<br />
+          
+          <center><b>OTP : ${otp}</b></center><br />
+          
+          This OTP is valid for a single use and will expire shortly. Please enter this OTP in the designated field on the registration page to verify your email address.
+          
+          If you did not initiate this registration process, please ignore this email.
+          
+          Thank you,
+          Practice-Pro (Practise karo, Pro Bano )
+          `,
+        outro: "Looking forward to do maore work with you.",
+      },
+    };
+    let mail = mailGenerator.generate(response);
+    let message = {
+      from: process.env.EMAIL,
+      to: userEmail, // set the recipient here
+      subject: "OTP Verification for Your Spin Wheel",
+      html: mail,
+    };
+    await transporter.sendMail(message);
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       name,
       userEmail,
       phone,
       password: hashPassword,
+      otp: otp,
       isAdmin: false,
     });
-    return res.status(200).json({ message: "User created successfully", result: newUser });
+    return res.status(200).json({ message: "Email Sent successfully" });
   } catch (error) {
     res.status(500).json({ message: error });
+  }
+};
+
+const generateOTP = async () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const verifyOtp = async (req, res) => {
+  const { userEmail, otp } = req.body;
+  console.log(userEmail, otp);
+  // Here you would retrieve the user's OTP from the database based on their email or any other identifier
+  // For simplicity, let's assume the correct OTP is '123456'
+  var originalOtp;
+  const user = await User.findOne({ userEmail });
+  if (!user) {
+    return res.status(404).json({ message: "User Does Not Exist..!" });
+  }
+  originalOtp = user.otp;
+  if (otp === originalOtp) {
+    await User.updateOne({ userEmail }, { isVerified: true });
+    return res.json({ message: "OTP verified successfully!" });
+  } else {
+    res.status(400).json({ message: "Invalid OTP. Please try again." });
   }
 };
 
@@ -101,4 +128,5 @@ module.exports = {
   Signup,
   Login,
   GetUsers,
+  verifyOtp,
 };

@@ -7,6 +7,8 @@ const UserSchema = mongoose.Schema({
   phone: { type: Number, required: true },
   isAdmin: { type: Boolean, default: false },
   joinedDate: { type: Date, default: Date.now },
+  otp: { type: String, required: true },
+  isVerified: { type: Boolean, default: false },
   subscription: {
     plan: { type: String, enum: ["basic", "medium", "pro"] }, // Enum for plan types
     startDate: { type: Date },

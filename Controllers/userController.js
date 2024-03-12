@@ -13,7 +13,7 @@ const Signup = async (req, res) => {
     return res.status(400).json({ error: "No recipient email provided" });
   }
   const existingUser = await User.findOne({ userEmail });
-  if (existingUser) {
+  if (existingUser && existingUser.isVerified) {
     return res.status(404).json({ message: "User Alredy Exist" });
   }
   try {
@@ -56,19 +56,23 @@ const Signup = async (req, res) => {
     let message = {
       from: process.env.EMAIL,
       to: userEmail, // set the recipient here
-      subject: "OTP Verification for Your Spin Wheel",
+      subject: "OTP Verification for Signup Practice-Pro",
       html: mail,
     };
     await transporter.sendMail(message);
     const hashPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
-      name,
-      userEmail,
-      phone,
-      password: hashPassword,
-      otp: otp,
-      isAdmin: false,
-    });
+    if (existingUser) {
+      await User.findOneAndUpdate({ name, userEmail, phone, password: hashPassword, otp: otp, isAdmin: false });
+    } else {
+      await User.create({
+        name,
+        userEmail,
+        phone,
+        password: hashPassword,
+        otp: otp,
+        isAdmin: false,
+      });
+    }
     return res.status(200).json({ message: "Email Sent successfully" });
   } catch (error) {
     res.status(500).json({ message: error });

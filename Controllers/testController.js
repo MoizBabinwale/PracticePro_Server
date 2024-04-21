@@ -175,6 +175,7 @@ const appendToTest = async (req, res) => {
 const getSubjectsForTest = async (req, res) => {
   try {
     const { testId } = req.params;
+    console.log("testId ", testId);
     // Find the test by ID
     const test = await Test.findById(testId).populate("subjectIds");
     if (!test) {

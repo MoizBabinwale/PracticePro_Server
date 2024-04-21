@@ -19,11 +19,12 @@ const auth = (req, res, next) => {
         throw error;
       }
     }
-    if ((req.userId = decodeData?.id)) {
-      req.userId = decodeData.id;
+    console.log("req.userId ", decodeData?.id);
+    if (decodeData?.id) {
+      // req.userId = decodeData.id;
       next();
     } else {
-      res.status(404).json({ message: "To Create/Update/Delete product Must have userId" });
+      res.status(404).json({ message: "To Create/Update/Delete Must have userId" });
     }
   } catch (error) {
     console.log(error);

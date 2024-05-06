@@ -48,7 +48,6 @@ const createOreder = async (req, res) => {
       },
     ];
 
-    console.log(email, amount, subscribefor);
     const updatedUserData = await updateUserSubscription({ userEmail: email, subscribeFor: subscribefor });
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

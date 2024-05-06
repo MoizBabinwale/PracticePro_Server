@@ -19,7 +19,6 @@ const auth = (req, res, next) => {
         throw error;
       }
     }
-    console.log("req.userId ", decodeData?.id);
     if (decodeData?.id) {
       // req.userId = decodeData.id;
       next();

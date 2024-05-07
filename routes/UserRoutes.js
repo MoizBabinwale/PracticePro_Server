@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { Signup, Login, verifyOtp } = require("../Controllers/userController");
-const { createOreder, getToken, checkePaymentStatus, resetUserData } = require("../Instamojo/instamojo");
+const { createOrder, paymentVerification, updateUserSubscription } = require("../Controllers/PaymentCtrl");
 router.post("/signup", Signup);
 router.post("/verify-otp", verifyOtp);
+router.post("/checkout", createOrder);
+router.post("/paymentVerification", paymentVerification);
+router.post("/updateUserSubscription", updateUserSubscription);
 router.post("/login", Login);
-router.post("/get-token", getToken);
-router.post("/create-order", createOreder);
-router.get("/check-payment-status", checkePaymentStatus);
-router.get("/resetUserData", resetUserData);
 module.exports = router;

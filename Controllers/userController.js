@@ -8,7 +8,6 @@ const jwt = require("jsonwebtoken");
 
 const Signup = async (req, res) => {
   const { name, userEmail, password, phone } = req.body;
-  console.log(name, userEmail, phone);
   if (!userEmail) {
     return res.status(400).json({ error: "No recipient email provided" });
   }
@@ -85,7 +84,6 @@ const generateOTP = async () => {
 
 const verifyOtp = async (req, res) => {
   const { userEmail, otp } = req.body;
-  console.log(userEmail, otp);
   // Here you would retrieve the user's OTP from the database based on their email or any other identifier
   // For simplicity, let's assume the correct OTP is '123456'
   var originalOtp;

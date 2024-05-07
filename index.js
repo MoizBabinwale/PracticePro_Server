@@ -10,18 +10,22 @@ const testRoute = require("./routes/testRoutes.js");
 app.use(express.json({ limit: "30mb", extended: true }));
 app.use("/uploads", express.static("uploads"));
 // app.use(express.static("uploads"));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 //Routes
 app.use("/api", appRoute);
 app.use("/test", testRoute);
+
+const isTestMode = process.env.NODE_ENV === "test" ? true : false;
 
 const port = process.env.PORT || 5001;
 
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(port, () => console.log(`Server running on port ${port}`));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname + "/public", "index.htm"));
-});
-app.get("/*", (req, res) => {
-  res.status(404);
-  res.send("Web Page Not Found!");
+
+app.get("/api/getkey", (req, res) => {
+  console.log("is tes ", isTestMode);
+  res.status(200).json({ key: isTestMode ? process.env.TEST_KEY_ID : process.env.KEY_ID });
 });

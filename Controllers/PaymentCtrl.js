@@ -10,20 +10,24 @@ const instance = new Razorpay({
 });
 
 const createOrder = async (req, res, next) => {
-  const options = {
-    amount: Number(req.body.amount * 100),
-    currency: "INR",
-  };
-  const order = await instance.orders.create(options);
+  try {
+    const options = {
+      amount: Number(req.body.amount * 100),
+      currency: "INR",
+      receipt: req.body?.userName,
+    };
+    const order = await instance.orders.create(options);
 
-  res.status(200).json({
-    success: true,
-    order,
-  });
+    res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const paymentVerification = async (req, res) => {
-  console.log("req.body ", req.body);
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
   if (razorpay_order_id && razorpay_signature && razorpay_payment_id) {

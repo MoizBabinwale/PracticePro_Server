@@ -6,6 +6,7 @@ const DifficultyLevel = require("../model/difficultyLevel");
 const Result = require("../model/result");
 const { ObjectId } = require("mongoose");
 const mongoose = require("mongoose");
+const AppError = require("../utils/AppError");
 
 // Controller functions for subjects
 const createSubject = async (req, res) => {
@@ -19,13 +20,13 @@ const createSubject = async (req, res) => {
 };
 
 // Controller functions for questions
-const createQuestion = async (req, res) => {
+const createQuestion = async (req, res, next) => {
   try {
     const { text, options, subjectId, testId, difficultyLevel } = req.body;
-
+    console.log(" req.body ", req.body);
     // Handle the case where _id is not present
-    const objectId = ObjectId(subjectId);
-    const topicExists = await Subject.exists({ _id: objectId });
+    if (!mongoose.isValidObjectId(subjectId)) return next(new AppError("Not Valid Subject ID", 404));
+    const topicExists = await Subject.findById(subjectId);
 
     if (!topicExists) {
       throw new Error("Topic not found");
@@ -267,6 +268,7 @@ const checkAnswer = async (req, res) => {
   try {
     const { questions } = req.body;
 
+    if (!userId) return next(new AppError("Provide UserID", 404));
     // Calculate score by comparing selected options with correct answers
     let score = 0;
     const questionData = questions.questions;
@@ -386,6 +388,31 @@ const deleteQeustions = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// const deleteQeustions = async (req, res) => {
+//   const { _id } = req.body; // Assuming _id is sent in the request body
+
+//   try {
+//     // Check if _id is provided
+//     if (!_id) {
+//       return res.status(400).json({ error: "Please provide _id" });
+//     }
+
+//     // Find the question by _id and delete it
+//     const deletedQuestion = await Question.findByIdAndDelete(ObjectId(_id));
+
+//     if (!deletedQuestion) {
+//       return res.status(404).json({ error: "Question not found" });
+//     }
+
+//     // If the question is deleted successfully, send a success response
+//     return res.status(200).json({ message: "Question deleted successfully" });
+//   } catch (error) {
+//     // If an error occurs, send an error response
+//     console.error("Error deleting question:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 
 module.exports = {
   getAllSubjects,

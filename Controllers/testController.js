@@ -23,7 +23,6 @@ const createSubject = async (req, res) => {
 const createQuestion = async (req, res, next) => {
   try {
     const { text, options, subjectId, testId, difficultyLevel } = req.body;
-    console.log(" req.body ", req.body);
     // Handle the case where _id is not present
     if (!mongoose.isValidObjectId(subjectId)) return next(new AppError("Not Valid Subject ID", 404));
     const topicExists = await Subject.findById(subjectId);
@@ -106,7 +105,7 @@ const updateQuestions = async (req, res) => {
 
       if (_id) {
         const updatedQuestion = await Question.findByIdAndUpdate(
-          ObjectId(_id),
+          _id,
           {
             text,
             options,
@@ -374,8 +373,7 @@ const deleteQeustions = async (req, res) => {
     }
 
     // Find the question by _id and delete it
-    const deletedQuestion = await Question.findByIdAndDelete(ObjectId(_id));
-
+    const deletedQuestion = await Question.findByIdAndDelete(_id);
     if (!deletedQuestion) {
       return res.status(404).json({ error: "Question not found" });
     }

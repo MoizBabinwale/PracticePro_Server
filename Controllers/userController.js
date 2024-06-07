@@ -29,7 +29,7 @@ const Signup = async (req, res) => {
       theme: "default",
       product: {
         name: "Practice Pro - Registration ",
-        link: "https://practice-pro-client.vercel.app/",
+        link: "https://practisepro.co.in/",
       },
     });
     let response = {
@@ -103,6 +103,7 @@ const verifyOtp = async (req, res) => {
 const Login = async (req, res) => {
   const { userEmail, password } = req.body;
   try {
+    console.log("userEmail ", userEmail);
     const isUserExist = await User.findOne({ userEmail });
     if (!isUserExist) {
       return res.status(404).json({ message: "User Does Not Exist..!" });
@@ -112,6 +113,7 @@ const Login = async (req, res) => {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
     const token = jwt.sign({ email: isUserExist.email, id: isUserExist._id }, process.env.JWT_SECRETE, { expiresIn: "1h" });
+    console.log("isUserExist ", isUserExist);
     res.status(200).json({ data: isUserExist, token, expiresIn: "1h" });
   } catch (error) {
     res.status(500).json({ message: "Something Went Wrong..!" });

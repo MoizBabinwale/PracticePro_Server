@@ -38,7 +38,7 @@ const paymentVerification = async (req, res) => {
       razorpay_payment_id,
       razorpay_signature,
     });
-    res.redirect(`https://practice-pro-client.vercel.app/paymentsuccess?reference=${razorpay_payment_id}`);
+    res.redirect(`https://practisepro.co.in/paymentsuccess?reference=${razorpay_payment_id}`);
   } else {
     res.status(400).json({
       success: false,

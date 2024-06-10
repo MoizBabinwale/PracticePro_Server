@@ -10,6 +10,7 @@ const testRoute = require("./routes/testRoutes.js");
 app.use(express.json({ limit: "30mb", extended: true }));
 app.use("/uploads", express.static("uploads"));
 // app.use(express.static("uploads"));
+const errorHandler = require("./middleware/errorhandler.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,7 +22,7 @@ app.use("/test", testRoute);
 const isTestMode = process.env.NODE_ENV === "test" ? true : false;
 
 const port = process.env.PORT || 5001;
-
+app.use(errorHandler);
 app.use(express.static(path.join(__dirname, "public")));
 app.listen(port, () => console.log(`Server running on port ${port}`));
 

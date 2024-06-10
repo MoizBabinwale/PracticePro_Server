@@ -251,11 +251,21 @@ const getAllTest = async (req, res) => {
 const getQuestionsBySubjectAndTestId = async (req, res) => {
   try {
     const { subjectId, testId } = req.body;
-    const questions = await Question.find({
-      subjectId: subjectId,
-      testId: testId,
-    });
 
+    // Find the test by testId and ensure it contains the specified subjectId
+    const test = await Test.findOne({
+      _id: testId,
+      subjectIds: subjectId,
+    }).populate("questionIds");
+
+    if (!test) {
+      return res.status(404).json({ message: "Test not found or does not include the specified subject." });
+    }
+
+    // Extract the populated questions
+    const questions = test.questionIds;
+
+    // Send the questions as the response
     res.status(200).json({ questions });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -387,30 +397,86 @@ const deleteQeustions = async (req, res) => {
   }
 };
 
-// const deleteQeustions = async (req, res) => {
-//   const { _id } = req.body; // Assuming _id is sent in the request body
+const deleteTest = async (req, res, next) => {
+  const { id } = req.params; // Assuming _id is sent in the request body
 
-//   try {
-//     // Check if _id is provided
-//     if (!_id) {
-//       return res.status(400).json({ error: "Please provide _id" });
-//     }
+  try {
+    // Check if _id is provided
+    if (!id) return next(new AppError("Id Not Provided", 500));
 
-//     // Find the question by _id and delete it
-//     const deletedQuestion = await Question.findByIdAndDelete(ObjectId(_id));
+    // Find the question by _id and delete it
+    const deleteTest = await Test.findByIdAndDelete(id);
+    if (!deleteTest) {
+      return res.status(404).json({ error: "Question not found" });
+    }
 
-//     if (!deletedQuestion) {
-//       return res.status(404).json({ error: "Question not found" });
-//     }
+    // If the question is deleted successfully, send a success response
+    return res.status(200).json({ message: "Test deleted successfully" });
+  } catch (error) {
+    return next(new AppError(`${error.message}`, 500));
+  }
+};
 
-//     // If the question is deleted successfully, send a success response
-//     return res.status(200).json({ message: "Question deleted successfully" });
-//   } catch (error) {
-//     // If an error occurs, send an error response
-//     console.error("Error deleting question:", error);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
+const getUnAssignedQuestion = async (req, res, next) => {
+  try {
+    const assignedQuestionIds = await Test.distinct("questionIds");
+
+    // Find all questions that are not in the assignedQuestionIds array
+    const unAssignedQuestions = await Question.find({
+      _id: { $nin: assignedQuestionIds },
+    });
+
+    // Send the unassigned questions as the response
+    res.status(200).json(unAssignedQuestions);
+  } catch (error) {
+    // If an error occurs, send an error response
+    return next(new AppError(`${error.message}`, 500));
+  }
+};
+
+const assigneQuestion = async (req, res, next) => {
+  try {
+    const { testId, questionId } = req.body;
+    // Find the test by testId and push the questionId into questionIds array
+    const updatedTest = await Test.findByIdAndUpdate(testId, { $push: { questionIds: questionId } }, { new: true, useFindAndModify: false });
+
+    if (!updatedTest) {
+      return res.status(404).json({ message: "Test not found." });
+    }
+
+    res.status(200).json({ message: "Question assigned successfully.", test: updatedTest });
+  } catch (error) {
+    // If an error occurs, send an error response
+    return next(new AppError(`${error.message}`, 500));
+  }
+};
+
+const assignQuestionToTestsAndSubjects = async (req, res) => {
+  try {
+    const { questionId, testIds, subjectIds } = req.body;
+
+    // Validate inputs
+    if (!questionId || !Array.isArray(testIds) || !Array.isArray(subjectIds)) {
+      return res.status(400).json({ message: "Invalid input." });
+    }
+    const testIdsOnly = testIds.map((test) => test.testId);
+    const subjectIdsOnly = subjectIds.map((subject) => subject.subjectId);
+
+    // Update the question with the new subject IDs
+    const question = await Question.findByIdAndUpdate(questionId, { $set: { subjectIds: subjectIdsOnly } }, { new: true, useFindAndModify: false });
+
+    if (!question) {
+      return res.status(404).json({ message: "Question not found." });
+    }
+
+    // Add the question ID to the specified tests
+    await Test.updateMany({ _id: { $in: testIdsOnly } }, { $addToSet: { questionIds: questionId } });
+
+    res.status(200).json({ message: "Question assigned successfully.", question });
+  } catch (err) {
+    res.status(500).json({ message: "An error occurred while assigning the question.", error: err.message });
+  }
+};
 
 module.exports = {
   getAllSubjects,
@@ -433,4 +499,8 @@ module.exports = {
   deleteQeustions,
   createQuestionImage,
   getDemoQuestion,
+  getUnAssignedQuestion,
+  assigneQuestion,
+  deleteTest,
+  assignQuestionToTestsAndSubjects,
 };

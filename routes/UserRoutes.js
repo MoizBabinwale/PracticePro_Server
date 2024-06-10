@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Signup, Login, verifyOtp } = require("../Controllers/userController");
+const { Signup, Login, verifyOtp, getUserByMail, changePassword } = require("../Controllers/userController");
 const { createOrder, paymentVerification, updateUserSubscription } = require("../Controllers/PaymentCtrl");
 router.post("/signup", Signup);
 router.post("/verify-otp", verifyOtp);
@@ -8,4 +8,6 @@ router.post("/checkout", createOrder);
 router.post("/paymentVerification", paymentVerification);
 router.post("/updateUserSubscription", updateUserSubscription);
 router.post("/login", Login);
+router.post("/getUserByMail", getUserByMail);
+router.post("/change-password", changePassword);
 module.exports = router;

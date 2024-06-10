@@ -30,12 +30,12 @@ const questionSchema = new mongoose.Schema({
   subjectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Subject",
-    required: true,
+    // required: true,
   },
   testId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Test",
-    required: true,
+    // required: true,
   },
   difficultyLevel: {
     type: mongoose.Schema.Types.ObjectId,

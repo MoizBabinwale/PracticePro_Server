@@ -6,6 +6,7 @@ const User = require("../model/auth");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/AppError");
+const Payment = require("../model/paymentModal");
 
 const Signup = async (req, res) => {
   const { name, userEmail, password, phone } = req.body;
@@ -202,6 +203,15 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+const getAllPayments = async (req, res, next) => {
+  try {
+    const payments = await Payment.find().populate("userDetail");
+    return res.status(200).json({ data: payments, message: "Payment fetched successfully" });
+  } catch (error) {
+    return next(new AppError(`${error.message}`, 404));
+  }
+};
+
 module.exports = {
   Signup,
   Login,
@@ -209,4 +219,5 @@ module.exports = {
   verifyOtp,
   getUserByMail,
   changePassword,
+  getAllPayments,
 };

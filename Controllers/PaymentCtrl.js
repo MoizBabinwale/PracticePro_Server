@@ -18,6 +18,12 @@ const createOrder = async (req, res, next) => {
     };
     const order = await instance.orders.create(options);
 
+    await Payment.create({
+      razorpay_order_id: order?.id,
+      userDetail: req.body?.userId,
+      amount: req.body.amount,
+    });
+
     res.status(200).json({
       success: true,
       order,
@@ -29,16 +35,20 @@ const createOrder = async (req, res, next) => {
 
 const paymentVerification = async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
   if (razorpay_order_id && razorpay_signature && razorpay_payment_id) {
     // Database comes here
+    const payment = await Payment.findOne({ razorpay_order_id });
 
-    await Payment.create({
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    });
-    res.redirect(`https://practisepro.co.in/paymentsuccess?reference=${razorpay_payment_id}`);
+    if (!payment) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    payment.razorpay_payment_id = razorpay_payment_id;
+    payment.razorpay_signature = razorpay_signature;
+
+    payment.save();
+
+    res.redirect(`http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`);
   } else {
     res.status(400).json({
       success: false,
@@ -53,7 +63,6 @@ const updateUserSubscription = async (req, res) => {
     if (user) {
       let planExpiryDate;
       const currentDate = new Date();
-
       // Clone currentDate to ensure independent objects
       const startDate = new Date(currentDate);
 

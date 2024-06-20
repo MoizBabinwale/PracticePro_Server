@@ -212,6 +212,15 @@ const getAllPayments = async (req, res, next) => {
   }
 };
 
+const getAllUsersData = async (req, res, next) => {
+  try {
+    const user = await User.find();
+    return res.status(200).json({ user, message: "Payment fetched successfully" });
+  } catch (error) {
+    return next(new AppError(`${error.message}`, 404));
+  }
+};
+
 module.exports = {
   Signup,
   Login,
@@ -220,4 +229,5 @@ module.exports = {
   getUserByMail,
   changePassword,
   getAllPayments,
+  getAllUsersData,
 };

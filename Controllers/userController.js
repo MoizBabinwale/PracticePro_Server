@@ -62,6 +62,7 @@ const Signup = async (req, res) => {
     };
     await transporter.sendMail(message);
     const hashPassword = await bcrypt.hash(password, 10);
+    console.log("existingUser ", existingUser);
     if (existingUser) {
       await User.findOneAndUpdate({ name, userEmail, phone, password: hashPassword, otp: otp, isAdmin: false });
     } else {
@@ -72,6 +73,7 @@ const Signup = async (req, res) => {
         password: hashPassword,
         otp: otp,
         isAdmin: false,
+        subscriptionHistory: [],
       });
     }
     return res.status(200).json({ message: "Email Sent successfully" });

@@ -15,6 +15,7 @@ const UserSchema = mongoose.Schema({
     planExpiryDate: { type: Date },
     isSubscribed: { type: Boolean, default: false },
   },
+  subscriptionHistory: Array,
 });
 
 // Define a pre-save hook to update isSubscribed based on planExpiryDate

@@ -22,6 +22,7 @@ const createOrder = async (req, res, next) => {
       razorpay_order_id: order?.id,
       userDetail: req.body?.userId,
       amount: req.body.amount,
+      status: "Payment Pending",
     });
 
     res.status(200).json({
@@ -45,10 +46,10 @@ const paymentVerification = async (req, res) => {
 
     payment.razorpay_payment_id = razorpay_payment_id;
     payment.razorpay_signature = razorpay_signature;
-
+    payment.status = "Paid";
     payment.save();
 
-    res.redirect(`http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`);
+    res.redirect(`https://practisepro.co.in/paymentsuccess?reference=${razorpay_payment_id}`);
   } else {
     res.status(400).json({
       success: false,
@@ -76,12 +77,22 @@ const updateUserSubscription = async (req, res) => {
       }
 
       // Update user's subscription details
-      user.subscription = {
+      // Create a new subscription object
+      const newSubscription = {
         plan: subscribeFor,
         startDate: currentDate,
         planExpiryDate: planExpiryDate,
         isSubscribed: true,
       };
+
+      // Add the new subscription to the user's subscription history array
+      if (!user.subscriptionHistory) {
+        user.subscriptionHistory = [];
+      }
+      user.subscriptionHistory.push(newSubscription);
+
+      // Update the user's current subscription details
+      user.subscription = newSubscription;
 
       await user.save();
       res.status(200).json({

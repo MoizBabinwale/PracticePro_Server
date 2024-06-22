@@ -62,7 +62,6 @@ const Signup = async (req, res) => {
     };
     await transporter.sendMail(message);
     const hashPassword = await bcrypt.hash(password, 10);
-    console.log("existingUser ", existingUser);
     if (existingUser) {
       await User.findOneAndUpdate({ name, userEmail, phone, password: hashPassword, otp: otp, isAdmin: false });
     } else {
@@ -136,10 +135,8 @@ const GetUsers = async (req, res) => {
 const getUserByMail = async (req, res, next) => {
   try {
     const { mail } = req.body;
-    console.log("mail ", mail);
     if (!mail) return next(new AppError("Email Not Provided", 404));
     const user = await User.findOne({ userEmail: mail, isVerified: true });
-    console.log("user ", user);
     if (!user) return next(new AppError("Uesr Not Found!", 404));
     const otp = await generateOTP();
 

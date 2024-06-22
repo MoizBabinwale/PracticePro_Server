@@ -64,7 +64,7 @@ const getquestionswithLimit = async (req, res) => {
   try {
     const { testId, topicId, difficultyId, questionLimit } = req.body;
     let questions;
-    if (difficultyId === "65e013c36b8fc10cabbcf493") {
+    if (difficultyId === "65ed48e24aaf79bee6603f43") {
       questions = await Question.find({
         testId: testId,
         subjectId: topicId,

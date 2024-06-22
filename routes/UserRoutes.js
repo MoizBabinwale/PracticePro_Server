@@ -5,7 +5,7 @@ const { createOrder, paymentVerification, updateUserSubscription } = require("..
 router.post("/signup", Signup);
 router.post("/verify-otp", verifyOtp);
 router.post("/checkout", createOrder);
-router.post("/paymentverification", paymentVerification);
+router.post("/payment/paymentverification", paymentVerification);
 router.post("/updateUserSubscription", updateUserSubscription);
 router.post("/login", Login);
 router.post("/getUserByMail", getUserByMail);

@@ -46,7 +46,7 @@ router.get("/getUnAssignedQuestion", getUnAssignedQuestion);
 router.post("/assigneQuestion", assigneQuestion);
 
 router.get("/getAllSubjects", auth, getAllSubjects);
-router.get("/getSubjects/:testId", auth, getSubjectsForTest);
+router.get("/getSubjects/:testId", getSubjectsForTest);
 
 router.post("/createTimeLimit", auth, createTimeLimit);
 router.post("/createDifficulty", auth, createDifficulty);

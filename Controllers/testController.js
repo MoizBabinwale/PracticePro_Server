@@ -62,7 +62,7 @@ const getDemoQuestion = async (req, res) => {
 };
 const getquestionswithLimit = async (req, res) => {
   try {
-    const { testId, topicId, difficultyId, questionLimit } = req.body;
+    const { topicId, difficultyId, questionLimit } = req.body;
     let questions;
     if (difficultyId === "65ed48e24aaf79bee6603f43") {
       questions = await Question.find({
@@ -247,6 +247,30 @@ const getAllTest = async (req, res) => {
   }
 };
 
+const deleteSubjectFromTest = async (req, res) => {
+  const { testId, subjectId } = req.params;
+
+  try {
+    const test = await Test.findById(testId);
+    if (!test) {
+      return res.status(404).json({ message: "Test not found" });
+    }
+
+    const subjectIndex = test.subjectIds.findIndex((subject) => subject.id === subjectId);
+    if (subjectIndex === -1) {
+      return res.status(404).json({ message: "Subject not found in test" });
+    }
+
+    test.subjectIds.splice(subjectIndex, 1);
+    await test.save();
+
+    res.status(200).json({ message: "Subject deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting subject:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const getQuestionsBySubjectAndTestId = async (req, res) => {
   try {
     const { subjectId, testId } = req.body;
@@ -292,6 +316,7 @@ const checkAnswer = async (req, res) => {
       userId: userId,
       score: score,
       totalQuestions: questionData.length,
+      subjectId: questionData[0].subjectId,
       date: new Date(),
     });
     await result.save();
@@ -307,7 +332,7 @@ const checkAnswer = async (req, res) => {
 const getAllResult = async (req, res) => {
   try {
     const userId = req.userId;
-    const results = await Result.find({ userId: userId }).sort({ date: -1 });
+    const results = await Result.find({ userId: userId }).sort({ date: -1 }).populate("subjectId");
     res.status(200).json({ message: "Result Fetched", results });
   } catch (error) {
     console.error("Error:", error);
@@ -502,4 +527,5 @@ module.exports = {
   assigneQuestion,
   deleteTest,
   assignQuestionToTestsAndSubjects,
+  deleteSubjectFromTest,
 };

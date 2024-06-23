@@ -14,6 +14,11 @@ const resultSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  subjectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Subject",
+  },
   date: {
     type: Date,
     default: Date.now,

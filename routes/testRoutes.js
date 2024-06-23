@@ -24,6 +24,7 @@ const {
   assigneQuestion,
   deleteTest,
   assignQuestionToTestsAndSubjects,
+  deleteSubjectFromTest,
 } = require("../Controllers/testController");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
@@ -38,7 +39,7 @@ router.post("/appendToTest", auth, appendToTest);
 router.post("/getQuestion", auth, getQuestionsBySubjectAndTestId);
 router.get("/getDemoQuestion", auth, getDemoQuestion);
 router.post("/updateQuestion", auth, updateQuestions);
-router.post("/getquestionswithLimit", auth, getquestionswithLimit);
+router.post("/getquestionswithLimit", getquestionswithLimit);
 router.post("/checkAnswer", auth, checkAnswer);
 router.get("/getAllResult", auth, getAllResult);
 router.post("/deleteQeustions", auth, deleteQeustions);
@@ -50,9 +51,10 @@ router.get("/getSubjects/:testId", getSubjectsForTest);
 
 router.post("/createTimeLimit", auth, createTimeLimit);
 router.post("/createDifficulty", auth, createDifficulty);
-router.get("/getTimeLimits", auth, getTimeLimits);
-router.get("/getDifficulty", auth, getDifficulty);
+router.get("/getTimeLimits", getTimeLimits);
+router.get("/getDifficulty", getDifficulty);
 router.get("/getAllTest", getAllTest);
+router.delete("/tests/:testId/subjects/:subjectId", deleteSubjectFromTest);
 router.delete("/deleteTest/:id", deleteTest);
 router.post("/assignQuestionToTestsAndSubjects", assignQuestionToTestsAndSubjects);
 module.exports = router;

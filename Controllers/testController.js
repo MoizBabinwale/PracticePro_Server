@@ -34,7 +34,7 @@ const createQuestion = async (req, res, next) => {
       text,
       options,
       subjectId,
-      testId,
+      // testId,
       difficultyLevel,
       optionType: "text",
     });
@@ -66,18 +66,17 @@ const getquestionswithLimit = async (req, res) => {
     let questions;
     if (difficultyId === "65ed48e24aaf79bee6603f43") {
       questions = await Question.find({
-        testId: testId,
+        // testId: testId,
         subjectId: topicId,
       });
     } else {
       questions = await Question.find({
-        testId: testId,
+        // testId: testId,
         subjectId: topicId,
         difficultyLevel: difficultyId,
       });
     }
     questions = await shuffleArray(questions);
-
     // Limit the array to the specified questionLimit
     questions = questions.slice(0, questionLimit);
 
@@ -337,7 +336,7 @@ const createQuestionwithImageAswellOption = async (req, res) => {
       options: jsonOption,
       questionImage: QuestionImage ? QuestionImage : null,
       subjectId: JSON.parse(subjectId),
-      testId: JSON.parse(testId),
+      // testId: JSON.parse(testId),
       difficultyLevel: JSON.parse(difficultyLevel),
       optionType: "image",
     });
@@ -360,7 +359,7 @@ const createQuestionImage = async (req, res) => {
       text: path,
       options: JSON.parse(options),
       subjectId: subjectId,
-      testId: testId,
+      // testId: testId,
       difficultyLevel: difficultyLevel,
       optionType: "text",
     });

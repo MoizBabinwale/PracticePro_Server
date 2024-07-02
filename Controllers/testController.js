@@ -206,6 +206,16 @@ const createTimeLimit = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const deleteTimeLimit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await TimeLimit.findOneAndDelete({ _id: id }).exec();
+    res.status(201).json({ message: "Time Limit Deleated Successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const createDifficulty = async (req, res) => {
   try {
     const { level } = req.body;
@@ -528,4 +538,5 @@ module.exports = {
   deleteTest,
   assignQuestionToTestsAndSubjects,
   deleteSubjectFromTest,
+  deleteTimeLimit,
 };

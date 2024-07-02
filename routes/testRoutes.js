@@ -25,6 +25,7 @@ const {
   deleteTest,
   assignQuestionToTestsAndSubjects,
   deleteSubjectFromTest,
+  deleteTimeLimit,
 } = require("../Controllers/testController");
 const { auth } = require("../middleware/auth");
 const router = express.Router();
@@ -57,4 +58,5 @@ router.get("/getAllTest", getAllTest);
 router.delete("/tests/:testId/subjects/:subjectId", deleteSubjectFromTest);
 router.delete("/deleteTest/:id", deleteTest);
 router.post("/assignQuestionToTestsAndSubjects", assignQuestionToTestsAndSubjects);
+router.post("/deleteTimeLimit/:id", deleteTimeLimit);
 module.exports = router;

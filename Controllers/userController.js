@@ -116,8 +116,8 @@ const Login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
-    const token = jwt.sign({ email: isUserExist.email, id: isUserExist._id }, process.env.JWT_SECRETE, { expiresIn: "1h" });
-    res.status(200).json({ data: isUserExist, token, expiresIn: "1h" });
+    const token = jwt.sign({ email: isUserExist.email, id: isUserExist._id }, process.env.JWT_SECRETE, { expiresIn: "2h" });
+    res.status(200).json({ data: isUserExist, token, expiresIn: "2h" });
   } catch (error) {
     res.status(500).json({ message: "Something Went Wrong..!" });
   }
